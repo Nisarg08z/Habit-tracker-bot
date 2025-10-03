@@ -1,6 +1,6 @@
 # Habit Tracker Bot
 
-A modern habit tracking application with AI-powered insights using React + Tailwind CSS for the frontend and Python Flask with Gemini AI for the backend.
+A modern habit tracking application with AI-powered insights using React + Tailwind CSS for the frontend and Python Flask (with MongoDB) for the backend, plus optional Gemini AI.
 
 ## Features
 
@@ -23,10 +23,10 @@ A modern habit tracking application with AI-powered insights using React + Tailw
 
 ### Backend
 - Python Flask
-- SQLAlchemy
 - Flask-JWT-Extended
-- Google Generative AI (Gemini)
-- SQLite Database
+- Flask-CORS
+- Flask-PyMongo (MongoDB)
+- Google Generative AI (Gemini) [optional]
 
 ## Setup Instructions
 
@@ -62,21 +62,19 @@ A modern habit tracking application with AI-powered insights using React + Tailw
    pip install -r requirements.txt
    ```
 
-5. Set up environment variables:
-   - Run `setup_env.bat` to create the `.env` file
-   - Edit `backend/.env` and add your Gemini API key:
-     ```
-     GEMINI_API_KEY=your_actual_gemini_api_key_here
-     SECRET_KEY=dev-secret-key-change-in-production
-     DATABASE_URL=sqlite:///habits.db
-     ```
+5. Create a `.env` file in `backend/` with:
+   ```env
+   SECRET_KEY=dev-secret-key-change-in-production
+   MONGO_URI=mongodb://localhost:27017/habit_tracker
+   GEMINI_API_KEY=your_actual_gemini_api_key_here
+   ```
 
 6. Run the backend server:
    ```bash
    python app.py
    ```
 
-   The backend will be available at `http://localhost:5000`
+   Backend runs at `http://localhost:5000`
 
 ### Frontend Setup
 
@@ -95,7 +93,7 @@ A modern habit tracking application with AI-powered insights using React + Tailw
    npm start
    ```
 
-   The frontend will be available at `http://localhost:3000`
+   Frontend runs at `http://localhost:3000`
 
 ## Getting Your Gemini API Key
 
@@ -113,7 +111,7 @@ A modern habit tracking application with AI-powered insights using React + Tailw
 4. **View Insights**: Get AI-powered insights about your progress
 5. **Monitor Streaks**: Keep track of your habit streaks
 
-## API Endpoints
+## API Endpoints (key routes)
 
 ### Authentication
 - `POST /api/register` - Register a new user
@@ -126,32 +124,44 @@ A modern habit tracking application with AI-powered insights using React + Tailw
 - `DELETE /api/habits/<id>` - Delete a habit
 - `POST /api/habits/<id>/complete` - Mark habit as completed
 
+### Stats
+- `GET /api/stats` - Get cumulative totals and longest streak
+- `GET /api/streak` - Get current daily streak
+
 ### AI Features
-- `POST /api/ai/suggestions` - Get AI suggestions
+- `POST /api/ai/generate-habits` - Generate habit ideas
 - `GET /api/ai/insights` - Get personalized insights
+
+All protected routes require `Authorization: Bearer <JWT>`.
 
 ## Project Structure
 
 ```
-habit-tracker-bot/
+Habit tracker bot/
 ├── backend/
-│   ├── app.py                 # Flask application
-│   ├── requirements.txt       # Python dependencies
-│   └── env_example.txt        # Environment variables example
+│   ├── app.py                 # Flask app factory + boot
+│   ├── database.py            # MongoDB helpers
+│   ├── requirements.txt       # Python deps
+│   └── routes/                # Blueprints (auth, habits, stats, ai)
 ├── frontend/
 │   ├── public/
 │   │   └── index.html
 │   ├── src/
-│   │   ├── components/       # React components
-│   │   ├── contexts/         # React contexts
-│   │   ├── App.js           # Main App component
-│   │   ├── index.js         # Entry point
-│   │   └── index.css        # Tailwind CSS
+│   │   ├── components/        # React components
+│   │   ├── contexts/          # React contexts
+│   │   ├── App.jsx            # Main App component
+│   │   ├── index.js           # Entry point
+│   │   └── index.css          # Tailwind CSS
 │   ├── package.json
 │   ├── tailwind.config.js
 │   └── postcss.config.js
 └── README.md
 ```
+
+## CORS and JWT Notes
+- Frontend origin `http://localhost:3000` is allowed.
+- Send JWT in the `Authorization: Bearer <token>` header.
+- Cookies aren’t required unless you add cookie-based auth.
 
 ## Contributing
 
