@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import { api } from "../api";
 import toast from "react-hot-toast";
 import { ArrowLeft, Brain, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -25,8 +25,8 @@ const AIAssistant = () => {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/ai/chat/history",
+      const res = await api.get(
+        "/api/ai/chat/history",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -52,8 +52,8 @@ const AIAssistant = () => {
     setInput("");
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/ai/chat",
+      const res = await api.post(
+        "/api/ai/chat",
         { message: trimmed },
         { headers: { Authorization: `Bearer ${token}` } }
       );

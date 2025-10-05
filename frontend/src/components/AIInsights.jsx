@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { api } from "../api";
 import toast from "react-hot-toast";
 import {
   ArrowLeft,
@@ -30,7 +30,7 @@ const AIInsights = () => {
 
   const fetchInsights = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/ai/insights", {
+      const response = await api.get("/api/ai/insights", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setInsights(response.data.insight);
@@ -47,8 +47,8 @@ const AIInsights = () => {
   const fetchStats = async () => {
     try {
       const [statsRes, streakRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/stats", { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get("http://localhost:5000/api/streak", { headers: { Authorization: `Bearer ${token}` } }),
+        api.get("/api/stats", { headers: { Authorization: `Bearer ${token}` } }),
+        api.get("/api/streak", { headers: { Authorization: `Bearer ${token}` } }),
       ]);
 
 

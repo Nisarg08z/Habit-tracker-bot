@@ -37,9 +37,12 @@ def create_app():
     init_db(app)
     jwt = JWTManager(app)
     # Configure CORS for frontend origin with credentials and preflight support
+    
+    # near CORS config
+    frontend_origin = os.getenv('FRONTEND_ORIGIN', 'http://localhost:3000')
     CORS(
         app,
-        resources={r"/api/*": {"origins": "http://localhost:3000"}},
+        resources={r"/api/*": {"origins": [frontend_origin, "http://localhost:3000"]}},
         supports_credentials=True,
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization"],

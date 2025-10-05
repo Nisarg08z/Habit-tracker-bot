@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import { api } from "../api";
 import toast from "react-hot-toast";
 import { ArrowLeft, Save } from "lucide-react";
 
@@ -27,7 +27,7 @@ const HabitForm = () => {
   const fetchHabit = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/habits`, {
+      const response = await api.get(`/api/habits`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const habit = response.data.find((h) => h.id === id);
@@ -69,14 +69,14 @@ const HabitForm = () => {
       };
       
       if (isEditing) {
-        await axios.put(
-          `http://localhost:5000/api/habits/${id}`,
+        await api.put(
+          `/api/habits/${id}`,
           payload,
           { headers }
         );
         toast.success("Habit updated successfully!");
       } else {
-        await axios.post("http://localhost:5000/api/habits", payload, { headers });
+        await api.post("/api/habits", payload, { headers });
         toast.success("Habit created successfully!");
       }
       navigate("/dashboard");

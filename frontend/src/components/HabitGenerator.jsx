@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { api } from '../api';
 import toast from 'react-hot-toast';
 import { Brain, RefreshCw, Plus, X, Target, Calendar, Hash } from 'lucide-react';
 
@@ -18,8 +18,8 @@ const HabitGenerator = ({ onHabitAdded }) => {
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/ai/generate-habits',
+      const response = await api.post(
+        '/api/ai/generate-habits',
         { query: query.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -40,8 +40,8 @@ const HabitGenerator = ({ onHabitAdded }) => {
     setAddingHabits(prev => new Set([...prev, habit.id]));
     
     try {
-      await axios.post(
-        'http://localhost:5000/api/habits',
+      await api.post(
+        '/api/habits',
         {
           title: habit.title,
           description: habit.description,

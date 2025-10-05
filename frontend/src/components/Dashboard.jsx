@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import { api } from '../api';
 import toast from 'react-hot-toast';
 import HabitGenerator from './HabitGenerator';
 import {
@@ -35,7 +35,7 @@ const Dashboard = () => {
 
   const testConnection = async () => {
     try {
-      await axios.get('http://localhost:5000/api/test');
+      await api.get('/api/test');
     } catch (error) {
       console.error('Backend connection failed:', error);
     }
@@ -43,7 +43,7 @@ const Dashboard = () => {
 
   const fetchHabits = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/habits');
+      const response = await api.get('/api/habits');
       setHabits(response.data);
     } catch (error) {
       toast.error('Failed to fetch habits');
@@ -55,7 +55,7 @@ const Dashboard = () => {
   const fetchGlobalStreak = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/streak', {
+      const response = await api.get('/api/streak', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setGlobalStreak(response.data.current_streak || 0);
@@ -67,8 +67,8 @@ const Dashboard = () => {
   const completeHabit = async (habitId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `http://localhost:5000/api/habits/${habitId}/complete`,
+      const response = await api.post(
+        `/api/habits/${habitId}/complete`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -113,8 +113,8 @@ const Dashboard = () => {
     if (!habitToDelete) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(
-        `http://localhost:5000/api/habits/${habitToDelete}`,
+      await api.delete(
+        `/api/habits/${habitToDelete}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success('Habit deleted');
