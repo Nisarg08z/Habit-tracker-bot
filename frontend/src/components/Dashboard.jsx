@@ -65,6 +65,21 @@ const Dashboard = () => {
   };
 
   const completeHabit = async (habitId) => {
+    // Optimistic UI update
+    const previousHabits = habits;
+    const optimisticallyUpdated = habits.map((habit) => {
+      if (habit.id !== habitId) return habit;
+      const currentCompletions = habit.today_completions || 0;
+      const incremented = Math.min(currentCompletions + 1, habit.target_count);
+      const isNowCompleted = incremented >= habit.target_count;
+      return {
+        ...habit,
+        today_completions: incremented,
+        is_completed_today: isNowCompleted,
+      };
+    });
+    setHabits(optimisticallyUpdated);
+
     try {
       const token = localStorage.getItem('token');
       const response = await api.post(
@@ -73,32 +88,30 @@ const Dashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Update the specific habit in state immediately for better UX
-      if (response.data.habit) {
-        setHabits(prevHabits =>
-          prevHabits.map(habit =>
+      // Reconcile with server response
+      if (response.data?.habit) {
+        const serverHabit = response.data.habit;
+        setHabits((prevHabits) =>
+          prevHabits.map((habit) =>
             habit.id === habitId
               ? {
-                ...habit,
-                current_streak: response.data.habit.current_streak,
-                longest_streak: response.data.habit.longest_streak,
-                today_completions: response.data.habit.today_completions,
-                is_completed_today: response.data.habit.is_completed_today
-              }
+                  ...habit,
+                  current_streak: serverHabit.current_streak,
+                  longest_streak: serverHabit.longest_streak,
+                  today_completions: serverHabit.today_completions,
+                  is_completed_today: serverHabit.is_completed_today,
+                }
               : habit
           )
         );
       }
 
       toast.success('Habit completed! 🎉');
-
-      // Refresh data to ensure consistency
-      setTimeout(() => {
-        fetchHabits();
-        fetchGlobalStreak();
-      }, 100);
-
+      // Update global streak display
+      fetchGlobalStreak();
     } catch (error) {
+      // Rollback on error
+      setHabits(previousHabits);
       const errorMessage = error.response?.data?.error || 'Failed to complete habit';
       toast.error(errorMessage);
     }
